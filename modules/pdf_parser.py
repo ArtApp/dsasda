@@ -138,88 +138,170 @@ class PDFParser:
     
     def _parse_devices(self, text: str):
         """Извлечение устройств из текста."""
-        # Поиск С2000М (консоль)
-        s2000m_pattern = r'С2000М(?:\s*исп\.?(\d+))?.*?(?:адрес|№)\s*(\d+)'
-        for match in re.finditer(s2000m_pattern, text, re.IGNORECASE):
-            version = match.group(1) if match.group(1) else None
-            address = int(match.group(2))
-            
-            device_info = get_device_info("С2000М")
-            device = Device(
-                address=address,
-                device_type=device_info["pprog_type"] if device_info else "S2000M console",
-                description="Прибор управления охранно-пожарный С2000М",
-                version=version
-            )
-            self.configuration.add_device(device)
+        # Поиск С2000М (консоль) - различные форматы записи
+        s2000m_patterns = [
+            r'[Пп]рибор\s*[Пп]риемно-?[Кк]онтрольный\s*С2000М.*?(?:адрес|№)\s*(\d+)',
+            r'С2000М(?:\s*\([^\)]*\))?.*?(?:адрес|№)\s*(\d+)',
+            r'С2000М\s*-\s*(\d+)\s*шт',
+            r'С2000-М(?:\s*\([^\)]*\))?.*?(?:адрес|№)\s*(\d+)',
+        ]
         
-        # Поиск КДЛ
-        kdl_pattern = r'С2000-КДЛ-2И(?:\s*исп\.?(\d+))?.*?(?:адрес|№)\s*(\d+)'
-        for match in re.finditer(kdl_pattern, text, re.IGNORECASE):
-            version = match.group(1) if match.group(1) else None
-            address = int(match.group(2))
-            
-            device_info = get_device_info("С2000-КДЛ-2И")
-            device = Device(
-                address=address,
-                device_type=device_info["pprog_type"] if device_info else "S2000-KDL-2I controller",
-                description="Контроллер двухпроводной линии связи",
-                version=version
-            )
-            self.configuration.add_device(device)
+        for pattern in s2000m_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                address = int(match.group(1)) if match.lastindex >= 1 else None
+                if address:
+                    device_info = get_device_info("С2000М")
+                    device = Device(
+                        address=address,
+                        device_type=device_info["pprog_type"] if device_info else "S2000M",
+                        description="Прибор управления охранно-пожарный С2000М",
+                        version=None
+                    )
+                    self.configuration.add_device(device)
+                    break  # Нашли хотя бы один раз
         
-        # Поиск СП2 (релейные модули)
-        sp2_pattern = r'С2000-СП2(?:\s*исп\.?(\d+))?.*?(?:адрес|№)\s*(\d+)'
-        for match in re.finditer(sp2_pattern, text, re.IGNORECASE):
-            version = match.group(1) if match.group(1) else None
-            address = int(match.group(2))
-            
-            device_info = get_device_info("С2000-СП2")
-            device = Device(
-                address=address,
-                device_type=device_info["pprog_type"] if device_info else "S2000-SP2 relay module",
-                description="Прибор приемно-контрольный и управления релейный",
-                version=version
-            )
-            self.configuration.add_device(device)
-            
-            # Добавляем два реле для каждого СП2
-            for relay_num in range(1, 3):
-                relay = Relay(
-                    device_address=address,
-                    relay_number=relay_num,
-                    program=RelayProgram.OFF
-                )
-                self.configuration.add_relay(relay)
+        # Поиск КДЛ-2И
+        kdl_patterns = [
+            r'[Кк]онтроллер\s*[Дд]вухпроводной\s*[Лл]инии\s*[Сс]вязи\s*КДЛ-2И.*?(\d+)\s*шт',
+            r'КДЛ-2И(?:\s*\([^\)]*\))?.*?(\d+)\s*шт',
+            r'С2000-КДЛ-2И.*?(\d+)\s*шт',
+        ]
+        
+        for pattern in kdl_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                count = int(match.group(1))
+                device_info = get_device_info("С2000-КДЛ-2И")
+                for i in range(count):
+                    device = Device(
+                        address=0,  # Адрес будет назначен позже
+                        device_type=device_info["pprog_type"] if device_info else "S2000-KDL-2I",
+                        description="Контроллер двухпроводной линии связи КДЛ-2И",
+                        version=None
+                    )
+                    self.configuration.add_device(device)
+                break
+        
+        # Поиск ДИП-34А
+        dip_patterns = [
+            r'[Ии]звещатель\s*[Пп]ожарный\s*[Дд]ымовой\s*ДИП-34[А-Я]?.*?(\d+)\s*шт',
+            r'ДИП-34[А-Я]?(?:\s*\([^\)]*\))?.*?(\d+)\s*шт',
+        ]
+        
+        for pattern in dip_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                count = int(match.group(1))
+                device_info = get_device_info("ДИП-34А")
+                for i in range(count):
+                    device = Device(
+                        address=0,
+                        device_type=device_info["pprog_type"] if device_info else "DIP-34A",
+                        description="Извещатель пожарный дымовой ДИП-34А",
+                        version=None
+                    )
+                    self.configuration.add_device(device)
+                break
+        
+        # Поиск ИПР 513
+        ipr_patterns = [
+            r'[Ии]звещатель\s*[Пп]ожарный\s*[Рр]учной\s*ИПР\s*513.*?(\d+)\s*шт',
+            r'ИПР\s*513[-3АМ]*.*?(\d+)\s*шт',
+        ]
+        
+        for pattern in ipr_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                count = int(match.group(1))
+                device_info = get_device_info("ИПР 513-3А")
+                for i in range(count):
+                    device = Device(
+                        address=0,
+                        device_type=device_info["pprog_type"] if device_info else "IPR-513",
+                        description="Извещатель пожарный ручной ИПР 513",
+                        version=None
+                    )
+                    self.configuration.add_device(device)
+                break
         
         # Поиск БКИ
-        bki_pattern = r'С2000-БКИ(?:\s*исп\.?(\d+))?.*?(?:адрес|№)\s*(\d+)'
-        for match in re.finditer(bki_pattern, text, re.IGNORECASE):
-            version = match.group(1) if match.group(1) else None
-            address = int(match.group(2))
-            
-            device_info = get_device_info("С2000-БКИ")
-            device = Device(
-                address=address,
-                device_type=device_info["pprog_type"] if device_info else "S2000-BKI interface module",
-                description="Блок клавиатурный интерфейс",
-                version=version
-            )
-            self.configuration.add_device(device)
+        bki_patterns = [
+            r'[Бб]лок\s*[Кк]оммутации\s*БКИ.*?(\d+)\s*шт',
+            r'БКИ-?\d*.*?(\d+)\s*шт',
+            r'С2000-БКИ.*?(\d+)\s*шт',
+        ]
         
-        # Поиск RS-200T
-        rs_pattern = r'RS-200T.*?(?:адрес|№)\s*(\d+)'
-        for match in re.finditer(rs_pattern, text, re.IGNORECASE):
-            address = int(match.group(1))
-            
-            device_info = get_device_info("RS-200T")
-            device = Device(
-                address=address,
-                device_type=device_info["pprog_type"] if device_info else "RS-200T network converter",
-                description="Преобразователь интерфейсов",
-                version=None
-            )
-            self.configuration.add_device(device)
+        for pattern in bki_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                count = int(match.group(1))
+                device_info = get_device_info("С2000-БКИ")
+                for i in range(count):
+                    device = Device(
+                        address=0,
+                        device_type=device_info["pprog_type"] if device_info else "S2000-BKI",
+                        description="Блок коммутации БКИ",
+                        version=None
+                    )
+                    self.configuration.add_device(device)
+                break
+        
+        # Поиск СП2-1 (табло)
+        sp2_patterns = [
+            r'[Тт]абло\s*[Сс]ветовое\s*СП2.*?(\d+)\s*шт',
+            r'СП2-?\d*.*?(\d+)\s*шт',
+            r'С2000-СП2.*?(\d+)\s*шт',
+        ]
+        
+        for pattern in sp2_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                count = int(match.group(1))
+                device_info = get_device_info("С2000-СП2")
+                for i in range(count):
+                    device = Device(
+                        address=0,
+                        device_type=device_info["pprog_type"] if device_info else "S2000-SP2",
+                        description="Табло световое СП2",
+                        version=None
+                    )
+                    self.configuration.add_device(device)
+                break
+        
+        # Поиск сирен
+        siren_patterns = [
+            r'[Сс]ирена\s*[Зз]вуковая.*?(\d+)\s*шт',
+            r'С2000-С\d*.*?(\d+)\s*шт',
+        ]
+        
+        for pattern in siren_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                count = int(match.group(1))
+                for i in range(count):
+                    device = Device(
+                        address=0,
+                        device_type="S2000-Siren",
+                        description="Сирена звуковая",
+                        version=None
+                    )
+                    self.configuration.add_device(device)
+                break
+        
+        # Поиск РС-200Т
+        rs_patterns = [
+            r'[Рр]елейный\s*[Бб]лок\s*РС-200Т.*?(\d+)\s*шт',
+            r'РС-200Т.*?(\d+)\s*шт',
+            r'RS-200T.*?(\d+)\s*шт',
+        ]
+        
+        for pattern in rs_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                count = int(match.group(1))
+                device_info = get_device_info("RS-200T")
+                for i in range(count):
+                    device = Device(
+                        address=0,
+                        device_type=device_info["pprog_type"] if device_info else "RS-200T",
+                        description="Релейный блок РС-200Т",
+                        version=None
+                    )
+                    self.configuration.add_device(device)
+                break
     
     def _parse_partitions(self, text: str):
         """Извлечение разделов и зон из текста."""
