@@ -13,7 +13,7 @@ try:
     import cv2
     import numpy as np
     OPENCV_AVAILABLE = True
-    NdArrayType = NdArrayType
+    NdArrayType = np.ndarray
 except ImportError:
     OPENCV_AVAILABLE = False
     np = None  # Заглушка для аннотаций типов

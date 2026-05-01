@@ -2,6 +2,7 @@
 Парсер проектной документации в формате PDF.
 Извлекает структурированные данные для конфигурации PProg.
 Интегрирован с NLP-анализатором для улучшения понимания контекста.
+Поддерживает обработку сканированных документов с улучшением качества изображений.
 """
 
 import re
@@ -21,6 +22,10 @@ from data.models import (
 )
 from data.equipment_db import get_device_info
 from modules.nlp_analyzer import RussianNLPAnalyzer, NLPAnalysisResult, EntityCategory
+from modules.scan_enhancer import (
+    enhance_scan, preprocess_for_ocr, ScanEnhancementConfig,
+    EnhancementResult, NoiseReductionMethod, BinarizationMethod
+)
 
 
 @dataclass
@@ -30,10 +35,32 @@ class ParseResult:
     warnings: list[str]
     errors: list[str]
     nlp_result: Optional[NLPAnalysisResult] = None  # Добавлено поле для NLP-результатов
+    enhancement_results: list[EnhancementResult] = None  # Результаты улучшения сканов
+
+
+@dataclass
+class ScannedPDFParserConfig:
+    """Конфигурация для обработки сканированных PDF."""
+    
+    # Настройки улучшения сканов
+    enhance_scans: bool = True
+    scan_enhancement_config: Optional[ScanEnhancementConfig] = None
+    
+    # Настройки OCR
+    ocr_enabled: bool = True
+    ocr_languages: str = "rus+eng"
+    
+    # Пороговые значения
+    min_image_dpi: int = 200  # Минимальное DPI для обработки
+    min_text_confidence: float = 0.5  # Минимальная уверенность OCR
+    
+    def __post_init__(self):
+        if self.scan_enhancement_config is None:
+            self.scan_enhancement_config = ScanEnhancementConfig()
 
 
 class PDFParser:
-    """Парсер проектной документации в формате PDF с NLP-анализом."""
+    """Парсер проектной документации в формате PDF с NLP-анализом и обработкой сканов."""
     
     # Паттерны для поиска устройств и адресов
     DEVICE_PATTERNS = {
@@ -56,18 +83,20 @@ class PDFParser:
         r'№\s*(\d+)',     # №1, №2
     ]
     
-    def __init__(self, use_nlp: bool = True):
+    def __init__(self, use_nlp: bool = True, scan_config: Optional[ScannedPDFParserConfig] = None):
         """
         Инициализация парсера.
         
         Args:
             use_nlp: Использовать ли NLP-анализ для обогащения данных
+            scan_config: Конфигурация для обработки сканированных документов
         """
         self.warnings: list[str] = []
         self.errors: list[str] = []
         self.configuration = Configuration()
         self.use_nlp = use_nlp
         self.nlp_analyzer = RussianNLPAnalyzer(use_spacy=use_nlp) if use_nlp else None
+        self.scan_config = scan_config or ScannedPDFParserConfig()
     
     def parse_file(self, pdf_path: str | Path) -> ParseResult:
         """
@@ -85,7 +114,8 @@ class PDFParser:
                 configuration=self.configuration,
                 warnings=self.warnings,
                 errors=self.errors,
-                nlp_result=None
+                nlp_result=None,
+                enhancement_results=[]
             )
         
         pdf_path = Path(pdf_path)
@@ -95,23 +125,34 @@ class PDFParser:
                 configuration=self.configuration,
                 warnings=self.warnings,
                 errors=self.errors,
-                nlp_result=None
+                nlp_result=None,
+                enhancement_results=[]
             )
         
         try:
             doc = fitz.open(pdf_path)
             self.configuration.project_name = pdf_path.stem
             
+            # Проверка типа PDF (текстовое или сканированное)
+            is_scanned = self._is_scanned_pdf(doc)
+            
             # Извлечение текста из всех страниц
             full_text = ""
-            for page in doc:
-                full_text += page.get_text()
+            enhancement_results = []
+            
+            if is_scanned and self.scan_config.enhance_scans:
+                # Обработка сканированного PDF с улучшением изображений
+                full_text, enhancement_results = self._extract_text_from_scanned_pdf(doc)
+            else:
+                # Стандартное извлечение текста
+                for page in doc:
+                    full_text += page.get_text()
             
             doc.close()
             
             # NLP-анализ текста (если включен)
             nlp_result = None
-            if self.use_nlp and self.nlp_analyzer:
+            if self.use_nlp and self.nlp_analyzer and full_text.strip():
                 try:
                     nlp_result = self.nlp_analyzer.analyze_text(full_text)
                     # Обогащение данных на основе NLP-анализа
@@ -120,9 +161,12 @@ class PDFParser:
                     self.warnings.append(f"NLP-анализ не выполнен: {str(e)}")
             
             # Парсинг различных секций
-            self._parse_devices(full_text)
-            self._parse_partitions(full_text)
-            self._parse_relays(full_text)
+            if full_text.strip():
+                self._parse_devices(full_text)
+                self._parse_partitions(full_text)
+                self._parse_relays(full_text)
+            else:
+                self.warnings.append("Не удалось извлечь текст из PDF. Возможно, требуется ручная обработка.")
             
         except Exception as e:
             self.errors.append(f"Ошибка при чтении PDF: {str(e)}")
@@ -131,8 +175,132 @@ class PDFParser:
             configuration=self.configuration,
             warnings=self.warnings,
             errors=self.errors,
-            nlp_result=nlp_result
+            nlp_result=nlp_result,
+            enhancement_results=enhancement_results or []
         )
+    
+    def _is_scanned_pdf(self, doc) -> bool:
+        """
+        Определение типа PDF: текстовое или сканированное.
+        
+        Args:
+            doc: PyMuPDF документ
+            
+        Returns:
+            True если PDF содержит изображения (сканированный), False если текстовый
+        """
+        if len(doc) == 0:
+            return False
+        
+        # Проверяем первые несколько страниц
+        pages_to_check = min(3, len(doc))
+        text_ratio = 0
+        image_count = 0
+        
+        for i in range(pages_to_check):
+            page = doc[i]
+            text_len = len(page.get_text().strip())
+            images = page.get_images()
+            image_count += len(images)
+            text_ratio += text_len
+        
+        # Если есть изображения и мало текста - это сканированный документ
+        avg_text_per_page = text_ratio / pages_to_check if pages_to_check > 0 else 0
+        has_images = image_count > 0
+        
+        # Считаем сканированным, если есть изображения и мало текста (<100 символов на страницу в среднем)
+        return has_images and avg_text_per_page < 100
+    
+    def _extract_text_from_scanned_pdf(self, doc) -> tuple[str, list[EnhancementResult]]:
+        """
+        Извлечение текста из сканированного PDF с предварительным улучшением изображений.
+        
+        Args:
+            doc: PyMuPDF документ
+            
+        Returns:
+            Кортеж (извлеченный текст, список результатов улучшения)
+        """
+        import tempfile
+        import os
+        
+        extracted_text = ""
+        enhancement_results = []
+        
+        # Проверяем доступность pytesseract для OCR
+        try:
+            import pytesseract
+            ocr_available = True
+        except ImportError:
+            ocr_available = False
+            self.warnings.append("pytesseract не установлен. OCR будет недоступен. Установите: pip install pytesseract")
+        
+        for page_num in range(len(doc)):
+            page = doc[page_num]
+            
+            # Получаем изображения со страницы
+            image_list = page.get_images(full=True)
+            
+            if not image_list and ocr_available:
+                # Если нет встроенных изображений, рендерим страницу как изображение
+                mat = fitz.Matrix(2.0, 2.0)  # Увеличиваем разрешение для лучшего OCR
+                pix = page.get_pixmap(matrix=mat)
+                
+                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                    pix.save(tmp.name)
+                    tmp_path = tmp.name
+                
+                try:
+                    # Улучшаем изображение
+                    enhanced_result = enhance_scan(
+                        tmp_path,
+                        config=self.scan_config.scan_enhancement_config
+                    )
+                    enhancement_results.append(enhanced_result)
+                    
+                    # Выполняем OCR на улучшенном изображении
+                    if ocr_available:
+                        page_text = pytesseract.image_to_string(
+                            enhanced_result.image,
+                            lang=self.scan_config.ocr_languages
+                        )
+                        extracted_text += page_text + "\n"
+                finally:
+                    os.unlink(tmp_path)
+            else:
+                # Обрабатываем каждое изображение на странице
+                for img_index, img_info in enumerate(image_list):
+                    xref = img_info[0]
+                    
+                    try:
+                        base_image = doc.extract_image(xref)
+                        image_bytes = base_image["image"]
+                        
+                        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                            tmp.write(image_bytes)
+                            tmp_path = tmp.name
+                        
+                        try:
+                            # Улучшаем изображение
+                            enhanced_result = enhance_scan(
+                                tmp_path,
+                                config=self.scan_config.scan_enhancement_config
+                            )
+                            enhancement_results.append(enhanced_result)
+                            
+                            # Выполняем OCR на улучшенном изображении
+                            if ocr_available:
+                                img_text = pytesseract.image_to_string(
+                                    enhanced_result.image,
+                                    lang=self.scan_config.ocr_languages
+                                )
+                                extracted_text += img_text + "\n"
+                        finally:
+                            os.unlink(tmp_path)
+                    except Exception as e:
+                        self.warnings.append(f"Ошибка обработки изображения на странице {page_num + 1}: {str(e)}")
+        
+        return extracted_text, enhancement_results
     
     def parse_text(self, text: str, project_name: str = "Project") -> ParseResult:
         """
@@ -480,18 +648,23 @@ class PDFParser:
                     relay.description = "Сирена оповещения"
 
 
-def parse_pdf_project(pdf_path: str | Path, use_nlp: bool = True) -> ParseResult:
+def parse_pdf_project(
+    pdf_path: str | Path, 
+    use_nlp: bool = True,
+    scan_config: Optional[ScannedPDFParserConfig] = None
+) -> ParseResult:
     """
     Удобная функция для парсинга PDF проекта.
     
     Args:
         pdf_path: Путь к PDF файлу
         use_nlp: Использовать ли NLP-анализ для обогащения данных
+        scan_config: Конфигурация для обработки сканированных документов
         
     Returns:
         ParseResult с конфигурацией
     """
-    parser = PDFParser(use_nlp=use_nlp)
+    parser = PDFParser(use_nlp=use_nlp, scan_config=scan_config)
     return parser.parse_file(pdf_path)
 
 
@@ -509,3 +682,32 @@ def parse_text_project(text: str, project_name: str = "Project", use_nlp: bool =
     """
     parser = PDFParser(use_nlp=use_nlp)
     return parser.parse_text(text, project_name)
+
+
+def parse_scanned_pdf(
+    pdf_path: str | Path,
+    enhance_config: Optional[ScanEnhancementConfig] = None,
+    ocr_languages: str = "rus+eng",
+    use_nlp: bool = True
+) -> ParseResult:
+    """
+    Удобная функция для парсинга сканированных PDF с улучшением качества изображений.
+    
+    Args:
+        pdf_path: Путь к PDF файлу
+        enhance_config: Конфигурация улучшения сканов (None = настройки по умолчанию)
+        ocr_languages: Языки для OCR (например, "rus+eng")
+        use_nlp: Использовать ли NLP-анализ
+        
+    Returns:
+        ParseResult с конфигурацией и результатами улучшения
+    """
+    scan_config = ScannedPDFParserConfig(
+        enhance_scans=True,
+        scan_enhancement_config=enhance_config,
+        ocr_enabled=True,
+        ocr_languages=ocr_languages
+    )
+    parser = PDFParser(use_nlp=use_nlp, scan_config=scan_config)
+    return parser.parse_file(pdf_path)
+
