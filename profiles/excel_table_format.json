@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "profile_id": "excel_table_format",
+    "name": "Табличный формат (Excel)",
+    "description": "Формат для спецификаций в виде таблиц Excel/CSV",
+    "bureau_name": "Проектные бюро с Excel-спецификациями",
+    "version": "1.0.0",
+    "created_at": "2026-05-01T05:59:43.629529",
+    "updated_at": "2026-05-01T05:59:43.629529",
+    "author": "",
+    "specification_format": "excel_table"
+  },
+  "device_mappings": [
+    {
+      "source_pattern": ".*Прибор.*С2000М.*",
+      "target_type": "S2000M console",
+      "pprog_type": "S2000M console",
+      "zone_type": null,
+      "algorithm": null,
+      "description": "Прибор управления",
+      "zone_types": []
+    },
+    {
+      "source_pattern": ".*КДЛ.*",
+      "target_type": "S2000-KDL-2I controller",
+      "pprog_type": "S2000-KDL-2I controller",
+      "zone_type": null,
+      "algorithm": null,
+      "description": "Контроллер КДЛ",
+      "zone_types": []
+    },
+    {
+      "source_pattern": ".*ДИП.*",
+      "target_type": "Addressable Smoke Detector",
+      "pprog_type": "Addressable Smoke Detector",
+      "zone_type": "Smoke Analog Addressable",
+      "algorithm": "B",
+      "description": "Дымовой извещатель",
+      "zone_types": []
+    },
+    {
+      "source_pattern": ".*ИПР.*",
+      "target_type": "Addressable Manual Call Point",
+      "pprog_type": "Addressable Manual Call Point",
+      "zone_type": "Manual Call Points",
+      "algorithm": "A",
+      "description": "Ручной извещатель",
+      "zone_types": []
+    }
+  ],
+  "parsing_rules": [
+    {
+      "name": "table_row",
+      "pattern": "^([^\\t]+)\\t([^\\t]+)\\t(\\d+)\\t(.*)$",
+      "field_mapping": {
+        "name": 1,
+        "type": 2,
+        "count": 3,
+        "location": 4
+      },
+      "description": "Парсинг строки таблицы (TAB-separated)",
+      "enabled": true,
+      "priority": 10
+    }
+  ],
+  "custom_patterns": {},
+  "settings": {
+    "delimiter": "\t",
+    "has_header": true,
+    "columns": {
+      "name": 0,
+      "type": 1,
+      "count": 2,
+      "location": 3
+    }
+  }
+}

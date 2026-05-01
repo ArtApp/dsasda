@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "profile_id": "bolid_standard",
+    "name": "Стандартный формат Болид",
+    "description": "Стандартный формат спецификаций от производителя",
+    "bureau_name": "НВП Болид",
+    "version": "1.0.0",
+    "created_at": "2026-05-01T05:59:43.629075",
+    "updated_at": "2026-05-01T05:59:43.629075",
+    "author": "",
+    "specification_format": "standard"
+  },
+  "device_mappings": [
+    {
+      "source_pattern": "С2000М",
+      "target_type": "S2000M console",
+      "pprog_type": "S2000M console",
+      "zone_type": null,
+      "algorithm": null,
+      "description": "Прибор управления охранно-пожарный",
+      "zone_types": []
+    },
+    {
+      "source_pattern": "С2000-КДЛ-2И",
+      "target_type": "S2000-KDL-2I controller",
+      "pprog_type": "S2000-KDL-2I controller",
+      "zone_type": null,
+      "algorithm": null,
+      "description": "Контроллер двухпроводной линии связи",
+      "zone_types": [
+        "Smoke Analog Addressable",
+        "Manual Call Points"
+      ]
+    },
+    {
+      "source_pattern": "ДИП-34",
+      "target_type": "Addressable Smoke Detector",
+      "pprog_type": "Addressable Smoke Detector",
+      "zone_type": "Smoke Analog Addressable",
+      "algorithm": "B",
+      "description": "Дымовой адресный извещатель",
+      "zone_types": []
+    },
+    {
+      "source_pattern": "ИПР 513",
+      "target_type": "Addressable Manual Call Point",
+      "pprog_type": "Addressable Manual Call Point",
+      "zone_type": "Manual Call Points",
+      "algorithm": "A",
+      "description": "Ручной адресный извещатель",
+      "zone_types": []
+    },
+    {
+      "source_pattern": "С2000-СП2",
+      "target_type": "S2000-SP2 relay module",
+      "pprog_type": "S2000-SP2 relay module",
+      "zone_type": null,
+      "algorithm": null,
+      "description": "Прибор релейный",
+      "zone_types": []
+    },
+    {
+      "source_pattern": "С2000-БКИ",
+      "target_type": "S2000-BKI interface module",
+      "pprog_type": "S2000-BKI interface module",
+      "zone_type": null,
+      "algorithm": null,
+      "description": "Блок клавиатурный",
+      "zone_types": []
+    }
+  ],
+  "parsing_rules": [
+    {
+      "name": "device_count",
+      "pattern": "(С2000[^\\d\\s]*|[А-Я]{2,3}-?\\d*[А-Я]?)\\s*(?:исп\\.?\\d+)?(?:.*?)(\\d+)\\s*шт",
+      "field_mapping": {
+        "device_type": 1,
+        "count": 2
+      },
+      "description": "Извлечение количества устройств",
+      "enabled": true,
+      "priority": 10
+    },
+    {
+      "name": "device_address",
+      "pattern": "(?:адрес|№|ARK|SC)\\s*(\\d+)",
+      "field_mapping": {
+        "address": 1
+      },
+      "description": "Извлечение адресов устройств",
+      "enabled": true,
+      "priority": 9
+    }
+  ],
+  "custom_patterns": {},
+  "settings": {}
+}

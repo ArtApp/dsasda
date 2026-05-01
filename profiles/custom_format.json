@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "profile_id": "custom_format",
+    "name": "Пользовательский формат",
+    "description": "Шаблон для создания пользовательских профилей парсинга",
+    "bureau_name": "Настраиваемый профиль",
+    "version": "1.0.0",
+    "created_at": "2026-05-01T05:59:43.630209",
+    "updated_at": "2026-05-01T05:59:43.630209",
+    "author": "",
+    "specification_format": "custom"
+  },
+  "device_mappings": [],
+  "parsing_rules": [],
+  "custom_patterns": {
+    "device_pattern": "",
+    "address_pattern": "",
+    "location_pattern": ""
+  },
+  "settings": {
+    "use_regex": true,
+    "case_sensitive": false,
+    "multiline": true
+  }
+}
