@@ -121,7 +121,17 @@ class RussianNLPAnalyzer:
             use_spacy: Использовать ли spaCy для глубокого анализа
         """
         self.nlp = None
-        self.morph = pymorphy3.MorphAnalyzer()
+        
+        if NLP_AVAILABLE:
+            try:
+                import pymorphy3
+                self.morph = pymorphy3.MorphAnalyzer()
+            except (ImportError, NameError):
+                self.morph = None
+                print("⚠ pymorphy3 недоступен")
+        else:
+            self.morph = None
+            print("⚠ NLP библиотеки недоступны")
         
         if use_spacy and NLP_AVAILABLE:
             try:
