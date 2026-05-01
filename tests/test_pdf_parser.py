@@ -1,6 +1,7 @@
 """
 Тесты парсера PDF на реальных тестовых файлах.
 Проверяет извлечение устройств, разделов и сценариев управления.
+Включая тесты интеграции с NLP-анализатором.
 """
 
 import unittest
@@ -9,7 +10,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.pdf_parser import PDFParser, parse_pdf_project
+from modules.pdf_parser import PDFParser, parse_pdf_project, parse_text_project
 from data.models import Configuration
 
 
@@ -243,6 +244,106 @@ class TestParserIntegration(unittest.TestCase):
         finally:
             if os.path.exists(temp_json):
                 os.unlink(temp_json)
+
+
+class TestNLPIntegration(unittest.TestCase):
+    """Тесты интеграции PDF-парсера с NLP-анализатором."""
+    
+    def test_nlp_enrichment_with_locations(self):
+        """Проверка обогащения данных информацией о местоположении."""
+        test_text = """
+        Проект системы пожарной сигнализации.
+        С2000М адрес 1 - 1 шт в помещении охраны.
+        С2000-КДЛ-2И - 2 шт в серверной комнате.
+        ДИП-34А - 10 шт в коридоре первого этажа.
+        """
+        
+        result = parse_text_project(test_text, use_nlp=True)
+        
+        # Проверка наличия NLP-результатов
+        self.assertIsNotNone(result.nlp_result, "NLP-результат отсутствует")
+        self.assertGreater(len(result.nlp_result.device_mentions), 0,
+                          "NLP не нашел упоминания устройств")
+        self.assertGreater(len(result.nlp_result.location_mentions), 0,
+                          "NLP не нашел упоминания локаций")
+    
+    def test_nlp_enrichment_with_addresses(self):
+        """Проверка использования NLP для назначения адресов устройствам."""
+        test_text = """
+        Установлено: С2000М адрес 5 - 1 шт.
+        С2000-БКИ - 2 шт.
+        """
+        
+        result = parse_text_project(test_text, use_nlp=True)
+        
+        # Проверка наличия NLP-результатов
+        self.assertIsNotNone(result.nlp_result)
+        self.assertGreater(len(result.nlp_result.address_mentions), 0,
+                          "NLP не нашел упоминания адресов")
+    
+    def test_nlp_relations_extraction(self):
+        """Проверка извлечения связей между устройствами."""
+        test_text = """
+        С2000М управляет табло выход.
+        С2000-СП2 включает сирену оповещения.
+        SC39-40 -> Табло Выход.
+        """
+        
+        result = parse_text_project(test_text, use_nlp=True)
+        
+        # Проверка наличия связей
+        self.assertIsNotNone(result.nlp_result)
+        self.assertGreater(len(result.nlp_result.relations), 0,
+                          "NLP не выявил связей между устройствами")
+    
+    def test_nlp_summary_generation(self):
+        """Проверка генерации краткого содержания."""
+        test_text = """
+        Проект склада: С2000М - 1 шт, КДЛ-2И - 3 шт, ДИП-34А - 100 шт.
+        Раздел 1: складское помещение.
+        """
+        
+        result = parse_text_project(test_text, use_nlp=True)
+        
+        self.assertIsNotNone(result.nlp_result)
+        self.assertTrue(len(result.nlp_result.summary) > 0,
+                       "Краткое содержание не сгенерировано")
+    
+    def test_parser_without_nlp(self):
+        """Проверка работы парсера без NLP (для совместимости)."""
+        test_text = """
+        С2000М - 1 шт.
+        ДИП-34А - 10 шт.
+        """
+        
+        result = parse_text_project(test_text, use_nlp=False)
+        
+        # NLP-результат должен отсутствовать
+        self.assertIsNone(result.nlp_result)
+        # Но устройства должны быть найдены
+        self.assertGreater(len(result.configuration.devices), 0)
+    
+    def test_parser_with_nlp_disabled_explicitly(self):
+        """Проверка явного отключения NLP через конструктор."""
+        parser = PDFParser(use_nlp=False)
+        test_text = "С2000М - 1 шт в помещении охраны."
+        result = parser.parse_text(test_text)
+        
+        self.assertIsNone(result.nlp_result)
+        self.assertIsNone(parser.nlp_analyzer)
+    
+    def test_nlp_enrichment_improves_descriptions(self):
+        """Проверка что NLP улучшает описания устройств."""
+        test_text = """
+        С2000М адрес 1 - прибор в помещении охраны.
+        С2000-КДЛ-2И - 2 шт в серверной комнате.
+        """
+        
+        # Парсинг с NLP
+        result_with_nlp = parse_text_project(test_text, use_nlp=True)
+        
+        # Проверка что NLP нашел локации
+        self.assertGreater(len(result_with_nlp.nlp_result.location_mentions), 0)
 
 
 if __name__ == "__main__":

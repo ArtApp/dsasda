@@ -1,6 +1,7 @@
 """
 Парсер проектной документации в формате PDF.
 Извлекает структурированные данные для конфигурации PProg.
+Интегрирован с NLP-анализатором для улучшения понимания контекста.
 """
 
 import re
@@ -19,6 +20,7 @@ from data.models import (
     ZoneType, RelayProgram, ManagementScenario
 )
 from data.equipment_db import get_device_info
+from modules.nlp_analyzer import RussianNLPAnalyzer, NLPAnalysisResult, EntityCategory
 
 
 @dataclass
@@ -27,10 +29,11 @@ class ParseResult:
     configuration: Configuration
     warnings: list[str]
     errors: list[str]
+    nlp_result: Optional[NLPAnalysisResult] = None  # Добавлено поле для NLP-результатов
 
 
 class PDFParser:
-    """Парсер проектной документации в формате PDF."""
+    """Парсер проектной документации в формате PDF с NLP-анализом."""
     
     # Паттерны для поиска устройств и адресов
     DEVICE_PATTERNS = {
@@ -53,10 +56,18 @@ class PDFParser:
         r'№\s*(\d+)',     # №1, №2
     ]
     
-    def __init__(self):
+    def __init__(self, use_nlp: bool = True):
+        """
+        Инициализация парсера.
+        
+        Args:
+            use_nlp: Использовать ли NLP-анализ для обогащения данных
+        """
         self.warnings: list[str] = []
         self.errors: list[str] = []
         self.configuration = Configuration()
+        self.use_nlp = use_nlp
+        self.nlp_analyzer = RussianNLPAnalyzer(use_spacy=use_nlp) if use_nlp else None
     
     def parse_file(self, pdf_path: str | Path) -> ParseResult:
         """
@@ -73,7 +84,8 @@ class PDFParser:
             return ParseResult(
                 configuration=self.configuration,
                 warnings=self.warnings,
-                errors=self.errors
+                errors=self.errors,
+                nlp_result=None
             )
         
         pdf_path = Path(pdf_path)
@@ -82,7 +94,8 @@ class PDFParser:
             return ParseResult(
                 configuration=self.configuration,
                 warnings=self.warnings,
-                errors=self.errors
+                errors=self.errors,
+                nlp_result=None
             )
         
         try:
@@ -96,6 +109,16 @@ class PDFParser:
             
             doc.close()
             
+            # NLP-анализ текста (если включен)
+            nlp_result = None
+            if self.use_nlp and self.nlp_analyzer:
+                try:
+                    nlp_result = self.nlp_analyzer.analyze_text(full_text)
+                    # Обогащение данных на основе NLP-анализа
+                    self._enrich_with_nlp(nlp_result)
+                except Exception as e:
+                    self.warnings.append(f"NLP-анализ не выполнен: {str(e)}")
+            
             # Парсинг различных секций
             self._parse_devices(full_text)
             self._parse_partitions(full_text)
@@ -107,7 +130,8 @@ class PDFParser:
         return ParseResult(
             configuration=self.configuration,
             warnings=self.warnings,
-            errors=self.errors
+            errors=self.errors,
+            nlp_result=nlp_result
         )
     
     def parse_text(self, text: str, project_name: str = "Project") -> ParseResult:
@@ -126,6 +150,16 @@ class PDFParser:
         self.warnings = []
         self.errors = []
         
+        # NLP-анализ текста (если включен)
+        nlp_result = None
+        if self.use_nlp and self.nlp_analyzer:
+            try:
+                nlp_result = self.nlp_analyzer.analyze_text(text)
+                # Обогащение данных на основе NLP-анализа
+                self._enrich_with_nlp(nlp_result)
+            except Exception as e:
+                self.warnings.append(f"NLP-анализ не выполнен: {str(e)}")
+        
         self._parse_devices(text)
         self._parse_partitions(text)
         self._parse_relays(text)
@@ -133,8 +167,89 @@ class PDFParser:
         return ParseResult(
             configuration=self.configuration,
             warnings=self.warnings,
-            errors=self.errors
+            errors=self.errors,
+            nlp_result=nlp_result
         )
+    
+    def _enrich_with_nlp(self, nlp_result: NLPAnalysisResult):
+        """
+        Обогащение извлеченных данных контекстной информацией из NLP-анализа.
+        
+        Args:
+            nlp_result: Результат NLP-анализа текста
+        """
+        if not nlp_result:
+            return
+        
+        # 1. Обогащение устройств информацией о местоположении
+        for device in self.configuration.devices:
+            # Поиск связей устройства с локациями
+            for relation in nlp_result.relations:
+                if relation.get('type') == 'LOCATED_IN':
+                    source = relation.get('source', '').lower()
+                    target = relation.get('target', '')
+                    
+                    # Проверяем, относится ли связь к этому устройству
+                    device_desc_lower = device.description.lower()
+                    if any(word in source for word in device_desc_lower.split()):
+                        # Добавляем информацию о местоположении в описание
+                        if target not in device.description:
+                            device.description += f" ({target})"
+        
+        # 2. Использование извлеченных адресов для уточнения адресации устройств
+        for addr_entity in nlp_result.address_mentions:
+            addr_value = addr_entity.metadata.get('address_value')
+            if addr_value and addr_value > 0:
+                # Проверяем, есть ли устройства без адреса, которым можно назначить этот адрес
+                for device in self.configuration.devices:
+                    if device.address == 0:
+                        # Проверяем контекст на соответствие типу устройства
+                        context = addr_entity.context.lower()
+                        device_type_lower = device.device_type.lower()
+                        
+                        # Простая эвристика: если устройство без адреса и тип совпадает по контексту
+                        if any(keyword in context for keyword in ['прибор', 'контроллер', 'блок']):
+                            device.address = addr_value
+                            break
+        
+        # 3. Обогащение разделов информацией о зонах из NLP
+        if nlp_result.location_mentions:
+            # Группировка упоминаний локаций
+            locations_by_keyword = {}
+            for loc_entity in nlp_result.location_mentions:
+                keyword = loc_entity.metadata.get('keyword', '')
+                if keyword not in locations_by_keyword:
+                    locations_by_keyword[keyword] = []
+                locations_by_keyword[keyword].append(loc_entity.text)
+            
+            # Добавление информации о локациях в названия разделов
+            for partition in self.configuration.partitions:
+                if not partition.name or partition.name.startswith("Раздел"):
+                    # Если у раздела стандартное имя, пробуем улучшить его
+                    if locations_by_keyword:
+                        # Берем первую найденную локацию как кандидат
+                        first_keyword = next(iter(locations_by_keyword))
+                        first_location = locations_by_keyword[first_keyword][0]
+                        partition.name = f"{first_location} (Раздел {partition.partition_id})"
+        
+        # 4. Обновление реле на основе выявленных связей CONTROLS
+        for relation in nlp_result.relations:
+            if relation.get('type') == 'CONTROLS':
+                source = relation.get('source', '')
+                target = relation.get('target', '')
+                
+                # Поиск реле по описанию
+                for relay in self.configuration.relays:
+                    if source.lower() in relay.description.lower():
+                        # Обновляем описание реле информацией о управляемом устройстве
+                        if target and target not in relay.description:
+                            relay.description += f" → {target}"
+        
+        # 5. Логирование предупреждений из NLP
+        if nlp_result.warnings:
+            for warning in nlp_result.warnings:
+                if warning not in self.warnings:
+                    self.warnings.append(f"NLP: {warning}")
     
     def _parse_devices(self, text: str):
         """Извлечение устройств из текста."""
@@ -365,30 +480,32 @@ class PDFParser:
                     relay.description = "Сирена оповещения"
 
 
-def parse_pdf_project(pdf_path: str | Path) -> ParseResult:
+def parse_pdf_project(pdf_path: str | Path, use_nlp: bool = True) -> ParseResult:
     """
     Удобная функция для парсинга PDF проекта.
     
     Args:
         pdf_path: Путь к PDF файлу
+        use_nlp: Использовать ли NLP-анализ для обогащения данных
         
     Returns:
         ParseResult с конфигурацией
     """
-    parser = PDFParser()
+    parser = PDFParser(use_nlp=use_nlp)
     return parser.parse_file(pdf_path)
 
 
-def parse_text_project(text: str, project_name: str = "Project") -> ParseResult:
+def parse_text_project(text: str, project_name: str = "Project", use_nlp: bool = True) -> ParseResult:
     """
     Удобная функция для парсинга текста проекта.
     
     Args:
         text: Текст проектной документации
         project_name: Имя проекта
+        use_nlp: Использовать ли NLP-анализ для обогащения данных
         
     Returns:
         ParseResult с конфигурацией
     """
-    parser = PDFParser()
+    parser = PDFParser(use_nlp=use_nlp)
     return parser.parse_text(text, project_name)
