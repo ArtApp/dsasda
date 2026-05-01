@@ -1,1 +1,4 @@
-Nothing needs to be added to .gitignore since only a markdown file (ROADMAP.md) was added, which is a source/config file and should not be ignored.
+```
+__pycache__/
+*.pyc
+```
