@@ -134,7 +134,7 @@ class WorkflowManager:
                     continue
                 
                 # Инициализация инструмента
-                if not tool.is_initialized:
+                if not tool._is_initialized:
                     if not tool.initialize():
                         error_msg = f"Failed to initialize tool: {tool_name}"
                         self._handle_step_error(state, step_name, error_msg, step_config)

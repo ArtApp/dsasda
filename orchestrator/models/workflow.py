@@ -29,9 +29,9 @@ class WorkflowState:
         self.failed_steps: List[str] = []
         self.started_at: Optional[datetime] = None
         self.completed_at: Optional[datetime] = None
-        self.context: Dict[str, Any] = field(default_factory=dict)
-        self.errors: List[str] = field(default_factory=list)
-        self.warnings: List[str] = field(default_factory=list)
+        self.context: Dict[str, Any] = {}
+        self.errors: List[str] = []
+        self.warnings: List[str] = []
     
     def start(self):
         """Начать выполнение workflow."""
