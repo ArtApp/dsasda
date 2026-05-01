@@ -1,44 +1,36 @@
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.out
-*.so
-*.dll
-*.exe
-*.class
-
+```
 # Dependencies
-.venv/
-venv/
-.env
-.env.local
-.env.*
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Test data and artifacts
+tests/__pycache__/
+tests/*.pyc
+tests/*.pyo
+tests/*.pyd
 
 # Logs and temp files
 *.log
 *.tmp
 *.swp
-*.swo
+
+# Environment
+.env
+.env.local
+.env.*
 
 # Editors
 .vscode/
 .idea/
 
-# Coverage and testing
+# Coverage reports
 .coverage
 coverage/
 htmlcov/
-.pytest_cache/
-.mypy_cache/
 
-# Distribution and build
-dist/
-build/
-target/
-.gradle/
-
-# System files
-.DS_Store
-Thumbs.db
+# PDF parser specific cache/temp files
+*.pdf.log
+*.pdf.tmp
+```
