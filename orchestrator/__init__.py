@@ -15,9 +15,21 @@ from orchestrator.tools.data_synthesizer import DataSynthesizer
 from orchestrator.tools.config_generator import ConfigGenerator
 from orchestrator.tools.report_generator import ReportGenerator
 
+# Модели данных
+from orchestrator.models.domain import (
+    Device,
+    Connection,
+    Partition,
+    ProjectDomainModel,
+    DeviceType,
+    ConfidenceLevel
+)
+from orchestrator.models.workflow import WorkflowStatus
+
 __all__ = [
     'WorkflowManager',
     'WorkflowState',
+    'WorkflowStatus',
     'AITool',
     'ToolResult',
     'ToolStatus',
@@ -29,4 +41,11 @@ __all__ = [
     'DataSynthesizer',
     'ConfigGenerator',
     'ReportGenerator',
+    # Модели данных
+    'Device',
+    'Connection',
+    'Partition',
+    'ProjectDomainModel',
+    'DeviceType',
+    'ConfidenceLevel',
 ]

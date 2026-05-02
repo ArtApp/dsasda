@@ -79,16 +79,26 @@ class AITool(ABC):
         Returns:
             True если инициализация успешна
         """
-        if self._is_initialized:
-            return True
+        self._is_initialized = True
+        return True
+    
+    def create_result(self, status: ToolStatus = ToolStatus.SUCCESS, **kwargs) -> ToolResult:
+        """
+        Создать результат выполнения инструмента.
         
-        try:
-            self._initialize()
-            self._is_initialized = True
-            return True
-        except Exception as e:
-            print(f"Error initializing {self.name}: {e}")
-            return False
+        Args:
+            status: Статус выполнения (по умолчанию SUCCESS)
+            **kwargs: Параметры для ToolResult
+            
+        Returns:
+            ToolResult с заданными параметрами
+        """
+        return ToolResult(tool_name=self.name, status=status, **kwargs)
+    
+    @property
+    def is_initialized(self) -> bool:
+        """Проверка инициализации инструмента."""
+        return self._is_initialized
     
     def _initialize(self):
         """Внутренний метод инициализации (переопределяется в подклассах)."""
