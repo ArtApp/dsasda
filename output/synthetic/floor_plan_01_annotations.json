@@ -1,0 +1,308 @@
+{
+  "images": [
+    {
+      "id": 1,
+      "width": 1024,
+      "height": 768
+    }
+  ],
+  "annotations": [
+    {
+      "id": 1,
+      "image_id": 1,
+      "category_id": 1,
+      "bbox": [
+        102,
+        638,
+        20,
+        20
+      ],
+      "area": 400,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D1",
+        "room": "103"
+      }
+    },
+    {
+      "id": 2,
+      "image_id": 1,
+      "category_id": 2,
+      "bbox": [
+        554,
+        576,
+        17,
+        17
+      ],
+      "area": 289,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D2",
+        "room": "101"
+      }
+    },
+    {
+      "id": 3,
+      "image_id": 1,
+      "category_id": 3,
+      "bbox": [
+        756,
+        398,
+        19,
+        19
+      ],
+      "area": 361,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D3",
+        "room": "101"
+      }
+    },
+    {
+      "id": 4,
+      "image_id": 1,
+      "category_id": 2,
+      "bbox": [
+        695,
+        153,
+        15,
+        15
+      ],
+      "area": 225,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D4",
+        "room": "100"
+      }
+    },
+    {
+      "id": 5,
+      "image_id": 1,
+      "category_id": 3,
+      "bbox": [
+        200,
+        297,
+        19,
+        19
+      ],
+      "area": 361,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D5",
+        "room": "100"
+      }
+    },
+    {
+      "id": 6,
+      "image_id": 1,
+      "category_id": 4,
+      "bbox": [
+        950,
+        629,
+        17,
+        17
+      ],
+      "area": 289,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D6",
+        "room": "103"
+      }
+    },
+    {
+      "id": 7,
+      "image_id": 1,
+      "category_id": 5,
+      "bbox": [
+        245,
+        525,
+        18,
+        18
+      ],
+      "area": 324,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D7",
+        "room": "101"
+      }
+    },
+    {
+      "id": 8,
+      "image_id": 1,
+      "category_id": 6,
+      "bbox": [
+        980,
+        386,
+        18,
+        18
+      ],
+      "area": 324,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D8",
+        "room": "100"
+      }
+    },
+    {
+      "id": 9,
+      "image_id": 1,
+      "category_id": 4,
+      "bbox": [
+        408,
+        373,
+        20,
+        20
+      ],
+      "area": 400,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D9",
+        "room": "101"
+      }
+    },
+    {
+      "id": 10,
+      "image_id": 1,
+      "category_id": 2,
+      "bbox": [
+        449,
+        46,
+        19,
+        19
+      ],
+      "area": 361,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D10",
+        "room": "100"
+      }
+    },
+    {
+      "id": 11,
+      "image_id": 1,
+      "category_id": 7,
+      "bbox": [
+        631,
+        126,
+        16,
+        16
+      ],
+      "area": 256,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D11",
+        "room": "102"
+      }
+    },
+    {
+      "id": 12,
+      "image_id": 1,
+      "category_id": 4,
+      "bbox": [
+        680,
+        459,
+        25,
+        25
+      ],
+      "area": 625,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D12",
+        "room": "103"
+      }
+    },
+    {
+      "id": 13,
+      "image_id": 1,
+      "category_id": 7,
+      "bbox": [
+        21,
+        506,
+        23,
+        23
+      ],
+      "area": 529,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D13",
+        "room": "101"
+      }
+    },
+    {
+      "id": 14,
+      "image_id": 1,
+      "category_id": 8,
+      "bbox": [
+        574,
+        309,
+        24,
+        24
+      ],
+      "area": 576,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D14",
+        "room": "100"
+      }
+    },
+    {
+      "id": 15,
+      "image_id": 1,
+      "category_id": 2,
+      "bbox": [
+        369,
+        222,
+        17,
+        17
+      ],
+      "area": 289,
+      "iscrowd": 0,
+      "attributes": {
+        "label": "D15",
+        "room": "103"
+      }
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "INPUT_MODULE",
+      "supercategory": "fire_safety"
+    },
+    {
+      "id": 2,
+      "name": "OTHER",
+      "supercategory": "fire_safety"
+    },
+    {
+      "id": 3,
+      "name": "CONTROL_PANEL",
+      "supercategory": "fire_safety"
+    },
+    {
+      "id": 4,
+      "name": "SOUND_ALARM",
+      "supercategory": "fire_safety"
+    },
+    {
+      "id": 5,
+      "name": "SMOKE_DETECTOR",
+      "supercategory": "fire_safety"
+    },
+    {
+      "id": 6,
+      "name": "RELAY",
+      "supercategory": "fire_safety"
+    },
+    {
+      "id": 7,
+      "name": "KDL",
+      "supercategory": "fire_safety"
+    },
+    {
+      "id": 8,
+      "name": "SOUNDER",
+      "supercategory": "fire_safety"
+    }
+  ]
+}

@@ -1,39 +1,53 @@
-```
-# Build outputs
-output/
-
-# Dependencies
+```gitignore
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.Python
+*.so
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+.mypy_cache/
 
-# Logs and temp files
-*.log
-*.tmp
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+.eggs/
+.installed.cfg
+*.egg
 
 # Environment
-.env
-.env.local
-*.env.*
+.venv/
+venv/
+env/
+ENV/
 
-# Editors
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor
 .vscode/
 .idea/
 *.swp
 *.swo
+*.tmp
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Distribution artifacts
-dist/
-build/
-*.egg-info/
-
-# OS generated files
-.DS_Store
-Thumbs.db
+# Local configuration
+.env
+.env.local
+*.env.*
+config.txt
 ```

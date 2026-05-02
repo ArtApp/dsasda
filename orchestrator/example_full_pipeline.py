@@ -13,7 +13,9 @@
 6. Создание отчёта
 
 Использование:
-    python example_full_pipeline.py /path/to/project/
+    python -m orchestrator.example_full_pipeline /path/to/project/
+    или из корня проекта:
+    PYTHONPATH=/workspace python orchestrator/example_full_pipeline.py
 
 """
 
@@ -21,6 +23,9 @@ import sys
 import json
 from pathlib import Path
 from datetime import datetime
+
+# Добавляем корень проекта в путь для импортов
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from orchestrator import (
     WorkflowManager,
@@ -278,11 +283,11 @@ def run_full_pipeline(project_path=None):
     
     synthesizer = orchestrator.tools['DataSynthesizer']
     
-    # Подготовка входных данных
+    # Подготовка входных данных в правильном формате
     input_data = {
-        'nlp_devices': devices_from_spec,
-        'cv_plan_devices': detected_devices,
-        'document_report': report
+        'nlp_result': nlp_result,  # Передаём весь результат NLP инструмента
+        'plan_result': cv_result,  # Передаём весь результат CV инструмента
+        'schematic_result': {},    # Для демо схемы нет
     }
     
     synth_result = synthesizer.execute(input_data)
@@ -366,21 +371,37 @@ def run_full_pipeline(project_path=None):
     
     report_generator = orchestrator.tools['ReportGenerator']
     
+    # Создаем статистику из доменной модели
+    stats = {
+        'total_devices': len(domain_model.devices) if hasattr(domain_model, 'devices') else 0,
+        'control_panels': sum(1 for d in domain_model.devices if hasattr(d, 'device_type') and str(d.device_type) == 'DeviceType.CONTROL_PANEL') if hasattr(domain_model, 'devices') else 0,
+        'smoke_detectors': sum(1 for d in domain_model.devices if hasattr(d, 'device_type') and str(d.device_type) == 'DeviceType.SMOKE_DETECTOR') if hasattr(domain_model, 'devices') else 0,
+        'manual_call_points': sum(1 for d in domain_model.devices if hasattr(d, 'device_type') and str(d.device_type) == 'DeviceType.MANUAL_CALL_POINT') if hasattr(domain_model, 'devices') else 0,
+        'partitions': len(domain_model.partitions) if hasattr(domain_model, 'partitions') else 0,
+    }
+    
     report_result = report_generator.execute({
         'domain_model': domain_model,
         'config': config_text,
-        'validation_result': {'status': 'success', 'issues': []}
+        'validation': {'status': 'success', 'issues': []},
+        'statistics': stats,
+        'output_path': 'output/report.html'
     })
     
-    report_html = report_result.data.get('report_html', '')
-    report_path = report_result.data.get('report_path', 'output/report.html')
+    if report_result is None or report_result.data is None:
+        print("   ⚠️  Ошибка генерации отчёта")
+        report_html = ''
+        report_path = 'output/report.html'
+    else:
+        report_html = report_result.data.get('report_preview', '')
+        report_path = report_result.data.get('output_path', 'output/report.html')
     
     print(f"   📄 Отчёт сгенерирован")
     print(f"   💾 Путь сохранения: {report_path}")
     print(f"   📏 Размер: {len(report_html)} байт")
     
     # Извлекаем статистику из отчёта
-    if report_result.data.get('statistics'):
+    if report_result and report_result.data and report_result.data.get('statistics'):
         stats = report_result.data['statistics']
         print(f"\n   📊 Статистика проекта:")
         print(f"      • Всего устройств: {stats.get('total_devices', 0)}")

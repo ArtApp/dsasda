@@ -1,0 +1,313 @@
+[
+  {
+    "data": {
+      "image": "output/synthetic/floor_plan_01.png"
+    },
+    "predictions": [
+      {
+        "result": [
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 102,
+              "y": 638,
+              "width": 20,
+              "height": 20,
+              "rotation": 0,
+              "labels": [
+                "INPUT_MODULE"
+              ]
+            },
+            "id": "1",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 554,
+              "y": 576,
+              "width": 17,
+              "height": 17,
+              "rotation": 0,
+              "labels": [
+                "OTHER"
+              ]
+            },
+            "id": "2",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 756,
+              "y": 398,
+              "width": 19,
+              "height": 19,
+              "rotation": 0,
+              "labels": [
+                "CONTROL_PANEL"
+              ]
+            },
+            "id": "3",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 695,
+              "y": 153,
+              "width": 15,
+              "height": 15,
+              "rotation": 0,
+              "labels": [
+                "OTHER"
+              ]
+            },
+            "id": "4",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 200,
+              "y": 297,
+              "width": 19,
+              "height": 19,
+              "rotation": 0,
+              "labels": [
+                "CONTROL_PANEL"
+              ]
+            },
+            "id": "5",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 950,
+              "y": 629,
+              "width": 17,
+              "height": 17,
+              "rotation": 0,
+              "labels": [
+                "SOUND_ALARM"
+              ]
+            },
+            "id": "6",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 245,
+              "y": 525,
+              "width": 18,
+              "height": 18,
+              "rotation": 0,
+              "labels": [
+                "SMOKE_DETECTOR"
+              ]
+            },
+            "id": "7",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 980,
+              "y": 386,
+              "width": 18,
+              "height": 18,
+              "rotation": 0,
+              "labels": [
+                "RELAY"
+              ]
+            },
+            "id": "8",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 408,
+              "y": 373,
+              "width": 20,
+              "height": 20,
+              "rotation": 0,
+              "labels": [
+                "SOUND_ALARM"
+              ]
+            },
+            "id": "9",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 449,
+              "y": 46,
+              "width": 19,
+              "height": 19,
+              "rotation": 0,
+              "labels": [
+                "OTHER"
+              ]
+            },
+            "id": "10",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 631,
+              "y": 126,
+              "width": 16,
+              "height": 16,
+              "rotation": 0,
+              "labels": [
+                "KDL"
+              ]
+            },
+            "id": "11",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 680,
+              "y": 459,
+              "width": 25,
+              "height": 25,
+              "rotation": 0,
+              "labels": [
+                "SOUND_ALARM"
+              ]
+            },
+            "id": "12",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 21,
+              "y": 506,
+              "width": 23,
+              "height": 23,
+              "rotation": 0,
+              "labels": [
+                "KDL"
+              ]
+            },
+            "id": "13",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 574,
+              "y": 309,
+              "width": 24,
+              "height": 24,
+              "rotation": 0,
+              "labels": [
+                "SOUNDER"
+              ]
+            },
+            "id": "14",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          },
+          {
+            "original_width": 1024,
+            "original_height": 768,
+            "image_rotation": 0,
+            "value": {
+              "x": 369,
+              "y": 222,
+              "width": 17,
+              "height": 17,
+              "rotation": 0,
+              "labels": [
+                "OTHER"
+              ]
+            },
+            "id": "15",
+            "from_name": "label",
+            "to_name": "image",
+            "type": "rectanglelabels",
+            "origin": "manual"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,149 @@
+{
+  "nodes": [
+    {
+      "id": "TERM_1",
+      "type": "smoke_detector",
+      "x": 113,
+      "y": 406,
+      "width": 30,
+      "height": 30,
+      "label": "T1",
+      "room": "N/A"
+    },
+    {
+      "id": "TERM_2",
+      "type": "smoke_detector",
+      "x": 226,
+      "y": 429,
+      "width": 30,
+      "height": 30,
+      "label": "T2",
+      "room": "N/A"
+    },
+    {
+      "id": "TERM_3",
+      "type": "smoke_detector",
+      "x": 339,
+      "y": 387,
+      "width": 30,
+      "height": 30,
+      "label": "T3",
+      "room": "N/A"
+    },
+    {
+      "id": "TERM_4",
+      "type": "smoke_detector",
+      "x": 452,
+      "y": 360,
+      "width": 30,
+      "height": 30,
+      "label": "T4",
+      "room": "N/A"
+    },
+    {
+      "id": "TERM_5",
+      "type": "smoke_detector",
+      "x": 565,
+      "y": 392,
+      "width": 30,
+      "height": 30,
+      "label": "T5",
+      "room": "N/A"
+    },
+    {
+      "id": "TERM_6",
+      "type": "smoke_detector",
+      "x": 678,
+      "y": 421,
+      "width": 30,
+      "height": 30,
+      "label": "T6",
+      "room": "N/A"
+    },
+    {
+      "id": "TERM_7",
+      "type": "smoke_detector",
+      "x": 791,
+      "y": 375,
+      "width": 30,
+      "height": 30,
+      "label": "T7",
+      "room": "N/A"
+    },
+    {
+      "id": "TERM_8",
+      "type": "control_panel",
+      "x": 904,
+      "y": 390,
+      "width": 30,
+      "height": 30,
+      "label": "T8",
+      "room": "N/A"
+    }
+  ],
+  "edges": [
+    {
+      "from_device_id": "TERM_1",
+      "to_device_id": "TERM_2",
+      "connection_type": "RS485",
+      "channel": 1,
+      "line": null,
+      "confidence": 0.6,
+      "metadata": {}
+    },
+    {
+      "from_device_id": "TERM_2",
+      "to_device_id": "TERM_3",
+      "connection_type": "RS485",
+      "channel": 2,
+      "line": null,
+      "confidence": 0.6,
+      "metadata": {}
+    },
+    {
+      "from_device_id": "TERM_3",
+      "to_device_id": "TERM_4",
+      "connection_type": "RS485",
+      "channel": 3,
+      "line": null,
+      "confidence": 0.6,
+      "metadata": {}
+    },
+    {
+      "from_device_id": "TERM_4",
+      "to_device_id": "TERM_5",
+      "connection_type": "RS485",
+      "channel": 4,
+      "line": null,
+      "confidence": 0.6,
+      "metadata": {}
+    },
+    {
+      "from_device_id": "TERM_5",
+      "to_device_id": "TERM_6",
+      "connection_type": "RS485",
+      "channel": 5,
+      "line": null,
+      "confidence": 0.6,
+      "metadata": {}
+    },
+    {
+      "from_device_id": "TERM_6",
+      "to_device_id": "TERM_7",
+      "connection_type": "RS485",
+      "channel": 6,
+      "line": null,
+      "confidence": 0.6,
+      "metadata": {}
+    },
+    {
+      "from_device_id": "TERM_7",
+      "to_device_id": "TERM_8",
+      "connection_type": "RS485",
+      "channel": 7,
+      "line": null,
+      "confidence": 0.6,
+      "metadata": {}
+    }
+  ]
+}

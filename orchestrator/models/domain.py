@@ -16,9 +16,13 @@ class DeviceType(str, Enum):
     RELAY = "relay"  # Релейный прибор (С2000-СП2)
     KEYBOARD = "keyboard"  # Блок клавиатурный (С2000-БКИ)
     SMOKE_DETECTOR = "smoke_detector"  # Дымовой извещатель (ДИП-34А)
+    HEAT_DETECTOR = "heat_detector"  # Тепловой извещатель
     MANUAL_CALL_POINT = "manual_call_point"  # Ручной извещатель (ИПР)
     SOUND_ALARM = "sound_alarm"  # Звуковой оповещатель
     LIGHT_ALARM = "light_alarm"  # Световой оповещатель (Маяк)
+    SOUNDER = "sounder"  # Комбинированный оповещатель
+    INPUT_MODULE = "input_module"  # Модуль ввода
+    OUTPUT_MODULE = "output_module"  # Модуль вывода
     OTHER = "other"
 
 
