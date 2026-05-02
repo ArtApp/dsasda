@@ -130,10 +130,15 @@ class DataSynthesizer(AITool):
         if not nlp_result:
             return devices
         
-        nlp_data = nlp_result.get('data', {})
-        device_list = nlp_data.get('devices', [])
+        # nlp_result может быть ToolResult или dict
+        if hasattr(nlp_result, 'data'):
+            # Это ToolResult
+            nlp_data = nlp_result.data.get('devices', [])
+        else:
+            # Это dict
+            nlp_data = nlp_result.get('data', {}).get('devices', [])
         
-        for d in device_list:
+        for d in nlp_data:
             try:
                 device_type = DeviceType(d.get('device_type', 'other'))
             except ValueError:
@@ -158,28 +163,64 @@ class DataSynthesizer(AITool):
         if not plan_result:
             return devices
         
-        plan_data = plan_result.get('data', {})
-        device_list = plan_data.get('devices', [])
+        # plan_result может быть ToolResult или dict
+        if hasattr(plan_result, 'data'):
+            # Это ToolResult
+            plan_data = plan_result.data.get('detected_devices', [])
+        else:
+            # Это dict
+            plan_data = plan_result.get('data', {}).get('detected_devices', [])
         
-        for d in device_list:
+        for d in plan_data:
+            # Обработка d как dict или как объекта
+            if isinstance(d, dict):
+                device_type_str = d.get('device_type', d.get('type', 'other'))
+                model = d.get('model', 'unknown')
+                location = d.get('location', d.get('room', ''))
+                room_number = d.get('room_number', d.get('room', ''))
+                confidence_val = d.get('confidence', 0.75)
+            else:
+                # Объект с атрибутами
+                device_type_str = getattr(d, 'device_type', getattr(d, 'type', 'other'))
+                model = getattr(d, 'model', 'unknown')
+                location = getattr(d, 'location', getattr(d, 'room', ''))
+                room_number = getattr(d, 'room_number', getattr(d, 'room', ''))
+                confidence_val = getattr(d, 'confidence', 0.75)
+            
             try:
-                device_type = DeviceType(d.get('device_type', 'other'))
+                device_type = DeviceType(device_type_str)
             except ValueError:
                 device_type = DeviceType.OTHER
             
+            # Конвертация confidence в ConfidenceLevel enum
+            confidence = self._get_confidence_level(confidence_val)
+            
             devices.append(Device(
                 device_type=device_type,
-                model=d.get('model', 'unknown'),
+                model=model,
                 address=0,  # На планах адреса обычно не указаны
                 quantity=1,
-                location=d.get('location'),
-                room_number=d.get('room_number'),
-                confidence=ConfidenceLevel(d.get('confidence', 0.75)),
+                location=location,
+                room_number=room_number,
+                confidence=confidence,
                 source='plan',
-                metadata={'coordinates': d.get('coordinates')},
+                metadata={'coordinates': getattr(d, 'coordinates', None)},
             ))
         
         return devices
+    
+    def _get_confidence_level(self, value: float) -> ConfidenceLevel:
+        """Конвертировать числовое значение в ConfidenceLevel enum."""
+        if value >= 0.9:
+            return ConfidenceLevel.VERY_HIGH
+        elif value >= 0.7:
+            return ConfidenceLevel.HIGH
+        elif value >= 0.5:
+            return ConfidenceLevel.MEDIUM
+        elif value >= 0.3:
+            return ConfidenceLevel.LOW
+        else:
+            return ConfidenceLevel.VERY_LOW
     
     def _extract_connections_from_schematic(self, schematic_result: Dict) -> List[Dict]:
         """Извлечь соединения из результата анализа схем."""

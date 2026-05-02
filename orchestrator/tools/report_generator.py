@@ -6,7 +6,7 @@ Report Generator - ИИ-инструмент для генерации отче�
 """
 
 import logging
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 from pathlib import Path
 import time
 
@@ -116,7 +116,7 @@ class ReportGenerator(AITool):
     
     def _generate_text_report(
         self,
-        domain_model: Dict,
+        domain_model: Union[Dict, Any],
         validation: Dict,
         statistics: Dict,
     ) -> str:
@@ -129,33 +129,57 @@ class ReportGenerator(AITool):
         lines.append("=" * 80)
         lines.append("")
         
-        # Общая информация
+        # Общая информация - поддержка dict и объекта
         lines.append("1. ОБЩАЯ ИНФОРМАЦИЯ")
         lines.append("-" * 40)
-        lines.append(f"Проект: {domain_model.get('project_name', 'Не указан')}")
+        if isinstance(domain_model, dict):
+            project_name = domain_model.get('project_name', 'Не указан')
+            devices = domain_model.get('devices', [])
+            partitions = domain_model.get('partitions', [])
+            connections = domain_model.get('connections', [])
+        else:
+            project_name = getattr(domain_model, 'project_name', 'Не указан')
+            devices = getattr(domain_model, 'devices', [])
+            partitions = getattr(domain_model, 'partitions', [])
+            connections = getattr(domain_model, 'connections', [])
+        
+        lines.append(f"Проект: {project_name}")
         lines.append(f"Дата генерации: {time.strftime('%Y-%m-%d %H:%M:%S')}")
         lines.append("")
         
         # Статистика
         lines.append("2. СТАТИСТИКА ПРОЕКТА")
         lines.append("-" * 40)
-        stats = statistics.get('total_devices', 0)
+        stats = statistics.get('total_devices', len(devices))
         lines.append(f"Всего устройств: {stats}")
-        lines.append(f"Всего разделов: {statistics.get('total_partitions', 0)}")
-        lines.append(f"Всего соединений: {statistics.get('total_connections', 0)}")
+        lines.append(f"Всего разделов: {statistics.get('total_partitions', len(partitions))}")
+        lines.append(f"Всего соединений: {statistics.get('total_connections', len(connections))}")
         lines.append("")
         
         # Устройства
         lines.append("3. СПИСОК УСТРОЙСТВ")
         lines.append("-" * 40)
         
-        devices = domain_model.get('devices', [])
         for i, device in enumerate(devices, 1):
-            dtype = device.get('device_type', 'unknown')
-            model = device.get('model', 'unknown')
-            address = device.get('address', 0)
-            location = device.get('location', '')
-            room = device.get('room_number', '')
+            if isinstance(device, dict):
+                # Обработка device_type как enum или строки
+                dt = device.get('device_type', '')
+                if isinstance(dt, dict):
+                    dtype = dt.get('value', str(dt))
+                elif hasattr(dt, 'value'):
+                    dtype = dt.value
+                else:
+                    dtype = str(dt)
+                model = device.get('model', '')
+                address = device.get('address', 0)
+                location = device.get('location', '')
+                room = device.get('room_number', '')
+            else:
+                dtype = device.device_type.value if hasattr(device.device_type, 'value') else str(device.device_type)
+                model = device.model
+                address = device.address
+                location = device.location or ''
+                room = device.room_number or ''
             
             line = f"{i}. {dtype} - {model}"
             if address > 0:
@@ -218,11 +242,19 @@ class ReportGenerator(AITool):
     
     def _generate_html_report(
         self,
-        domain_model: Dict,
+        domain_model: Any,
         validation: Dict,
         statistics: Dict,
     ) -> str:
         """Сгенерировать HTML отчет."""
+        # Получаем project_name из объекта или словаря
+        if hasattr(domain_model, 'project_name'):
+            project_name = domain_model.project_name
+        elif isinstance(domain_model, dict):
+            project_name = domain_model.get('project_name', 'Не указан')
+        else:
+            project_name = 'Не указан'
+        
         text_report = self._generate_text_report(domain_model, validation, statistics)
         
         html = f"""<!DOCTYPE html>
@@ -230,7 +262,7 @@ class ReportGenerator(AITool):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отчет проекта АПС - {domain_model.get('project_name', 'Unknown')}</title>
+    <title>Отчет проекта АПС - {project_name}</title>
     <style>
         body {{ font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }}
         h1 {{ color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }}
@@ -251,7 +283,7 @@ class ReportGenerator(AITool):
     
     <div class="section">
         <h2>📊 Общая информация</h2>
-        <p><strong>Проект:</strong> {domain_model.get('project_name', 'Не указан')}</p>
+        <p><strong>Проект:</strong> {project_name}</p>
         <p><strong>Дата генерации:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
     </div>
     
@@ -271,14 +303,39 @@ class ReportGenerator(AITool):
             <tr><th>#</th><th>Тип</th><th>Модель</th><th>Адрес</th><th>Локация</th></tr>
 """
         
-        devices = domain_model.get('devices', [])
+        # Получаем устройства из объекта или словаря
+        if hasattr(domain_model, 'devices'):
+            devices = domain_model.devices
+        elif isinstance(domain_model, dict):
+            devices = domain_model.get('devices', [])
+        else:
+            devices = []
+        
         for i, device in enumerate(devices, 1):
+            # Обрабатываем устройство как объект или словарь
+            if hasattr(device, 'device_type'):
+                dtype = device.device_type.value if hasattr(device.device_type, 'value') else str(device.device_type)
+                model = device.model
+                address = device.address
+                location = device.location or ''
+                room = device.room_number or ''
+            elif isinstance(device, dict):
+                dtype = device.get('device_type', 'unknown')
+                model = device.get('model', 'unknown')
+                address = device.get('address', 0)
+                location = device.get('location', '')
+                room = device.get('room_number', '')
+            else:
+                dtype = model = 'unknown'
+                address = 0
+                location = room = ''
+            
             html += f"""            <tr>
                 <td>{i}</td>
-                <td>{device.get('device_type', 'unknown')}</td>
-                <td>{device.get('model', 'unknown')}</td>
-                <td>{device.get('address', 0)}</td>
-                <td>{device.get('location', '')} {device.get('room_number', '')}</td>
+                <td>{dtype}</td>
+                <td>{model}</td>
+                <td>{address}</td>
+                <td>{location} {room}</td>
             </tr>
 """
         
