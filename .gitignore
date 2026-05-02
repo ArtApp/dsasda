@@ -8,36 +8,26 @@ __pycache__/
 env/
 venv/
 .venv/
-.ENV
-.ENV.*
-.venv/
-.venv.*
-.python-version
-.pytest_cache/
-.mypy_cache/
+.env
+.env.local
+.env.*
+
+# Build and distribution artifacts
+build/
+dist/
+*.egg-info/
+
+# Testing
 .coverage
 coverage/
 htmlcov/
 
-# Build artifacts
-build/
-dist/
-*.egg-info/
-.sconsign.dblite
-._*
-*.so
-*.o
-*.a
-*.obj
-*.out
-
 # Logs
 *.log
 
-# Environment
-.env
-.env.local
-.env.*
+# OS generated files
+.DS_Store
+Thumbs.db
 
 # Editors
 .vscode/
@@ -45,11 +35,4 @@ dist/
 *.swp
 *.swo
 *.tmp
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Test outputs
-orchestrator/output_test/
 ```
