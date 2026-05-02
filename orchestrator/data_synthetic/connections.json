@@ -1,0 +1,605 @@
+[
+  {
+    "source": "D0047",
+    "target": "D0052",
+    "type": "RS485",
+    "ports": {
+      "source": "L1",
+      "target": "LINE"
+    }
+  },
+  {
+    "source": "D0047",
+    "target": "D0053",
+    "type": "RS485",
+    "ports": {
+      "source": "L1",
+      "target": "LINE"
+    }
+  },
+  {
+    "source": "D0047",
+    "target": "D0054",
+    "type": "RS485",
+    "ports": {
+      "source": "L1",
+      "target": "LINE"
+    }
+  },
+  {
+    "source": "D0047",
+    "target": "D0055",
+    "type": "RS485",
+    "ports": {
+      "source": "L1",
+      "target": "LINE"
+    }
+  },
+  {
+    "source": "D0047",
+    "target": "D0056",
+    "type": "RS485",
+    "ports": {
+      "source": "L1",
+      "target": "LINE"
+    }
+  },
+  {
+    "source": "D0047",
+    "target": "D0057",
+    "type": "RS485",
+    "ports": {
+      "source": "L1",
+      "target": "LINE"
+    }
+  },
+  {
+    "source": "D0047",
+    "target": "D0058",
+    "type": "RS485",
+    "ports": {
+      "source": "L1",
+      "target": "LINE"
+    }
+  },
+  {
+    "source": "D0052",
+    "target": "D0001",
+    "type": "DLT",
+    "address": 2
+  },
+  {
+    "source": "D0053",
+    "target": "D0002",
+    "type": "DLT",
+    "address": 3
+  },
+  {
+    "source": "D0054",
+    "target": "D0003",
+    "type": "DLT",
+    "address": 4
+  },
+  {
+    "source": "D0055",
+    "target": "D0004",
+    "type": "DLT",
+    "address": 5
+  },
+  {
+    "source": "D0056",
+    "target": "D0005",
+    "type": "DLT",
+    "address": 6
+  },
+  {
+    "source": "D0057",
+    "target": "D0006",
+    "type": "DLT",
+    "address": 7
+  },
+  {
+    "source": "D0058",
+    "target": "D0007",
+    "type": "DLT",
+    "address": 8
+  },
+  {
+    "source": "D0052",
+    "target": "D0008",
+    "type": "DLT",
+    "address": 9
+  },
+  {
+    "source": "D0053",
+    "target": "D0009",
+    "type": "DLT",
+    "address": 10
+  },
+  {
+    "source": "D0054",
+    "target": "D0010",
+    "type": "DLT",
+    "address": 11
+  },
+  {
+    "source": "D0055",
+    "target": "D0011",
+    "type": "DLT",
+    "address": 12
+  },
+  {
+    "source": "D0056",
+    "target": "D0012",
+    "type": "DLT",
+    "address": 13
+  },
+  {
+    "source": "D0057",
+    "target": "D0013",
+    "type": "DLT",
+    "address": 14
+  },
+  {
+    "source": "D0058",
+    "target": "D0014",
+    "type": "DLT",
+    "address": 15
+  },
+  {
+    "source": "D0052",
+    "target": "D0015",
+    "type": "DLT",
+    "address": 16
+  },
+  {
+    "source": "D0053",
+    "target": "D0016",
+    "type": "DLT",
+    "address": 17
+  },
+  {
+    "source": "D0054",
+    "target": "D0017",
+    "type": "DLT",
+    "address": 18
+  },
+  {
+    "source": "D0055",
+    "target": "D0018",
+    "type": "DLT",
+    "address": 19
+  },
+  {
+    "source": "D0056",
+    "target": "D0019",
+    "type": "DLT",
+    "address": 20
+  },
+  {
+    "source": "D0057",
+    "target": "D0020",
+    "type": "DLT",
+    "address": 21
+  },
+  {
+    "source": "D0058",
+    "target": "D0021",
+    "type": "DLT",
+    "address": 22
+  },
+  {
+    "source": "D0052",
+    "target": "D0022",
+    "type": "DLT",
+    "address": 23
+  },
+  {
+    "source": "D0053",
+    "target": "D0023",
+    "type": "DLT",
+    "address": 24
+  },
+  {
+    "source": "D0054",
+    "target": "D0024",
+    "type": "DLT",
+    "address": 25
+  },
+  {
+    "source": "D0055",
+    "target": "D0025",
+    "type": "DLT",
+    "address": 26
+  },
+  {
+    "source": "D0056",
+    "target": "D0026",
+    "type": "DLT",
+    "address": 27
+  },
+  {
+    "source": "D0057",
+    "target": "D0027",
+    "type": "DLT",
+    "address": 28
+  },
+  {
+    "source": "D0058",
+    "target": "D0028",
+    "type": "DLT",
+    "address": 29
+  },
+  {
+    "source": "D0052",
+    "target": "D0029",
+    "type": "DLT",
+    "address": 30
+  },
+  {
+    "source": "D0053",
+    "target": "D0030",
+    "type": "DLT",
+    "address": 31
+  },
+  {
+    "source": "D0054",
+    "target": "D0031",
+    "type": "DLT",
+    "address": 32
+  },
+  {
+    "source": "D0055",
+    "target": "D0032",
+    "type": "DLT",
+    "address": 33
+  },
+  {
+    "source": "D0056",
+    "target": "D0033",
+    "type": "DLT",
+    "address": 34
+  },
+  {
+    "source": "D0057",
+    "target": "D0034",
+    "type": "DLT",
+    "address": 35
+  },
+  {
+    "source": "D0058",
+    "target": "D0035",
+    "type": "DLT",
+    "address": 36
+  },
+  {
+    "source": "D0052",
+    "target": "D0036",
+    "type": "DLT",
+    "address": 37
+  },
+  {
+    "source": "D0053",
+    "target": "D0037",
+    "type": "DLT",
+    "address": 38
+  },
+  {
+    "source": "D0054",
+    "target": "D0038",
+    "type": "DLT",
+    "address": 39
+  },
+  {
+    "source": "D0055",
+    "target": "D0039",
+    "type": "DLT",
+    "address": 40
+  },
+  {
+    "source": "D0056",
+    "target": "D0040",
+    "type": "DLT",
+    "address": 41
+  },
+  {
+    "source": "D0057",
+    "target": "D0041",
+    "type": "DLT",
+    "address": 42
+  },
+  {
+    "source": "D0058",
+    "target": "D0042",
+    "type": "DLT",
+    "address": 43
+  },
+  {
+    "source": "D0052",
+    "target": "D0043",
+    "type": "DLT",
+    "address": 44
+  },
+  {
+    "source": "D0053",
+    "target": "D0044",
+    "type": "DLT",
+    "address": 45
+  },
+  {
+    "source": "D0054",
+    "target": "D0045",
+    "type": "DLT",
+    "address": 46
+  },
+  {
+    "source": "D0055",
+    "target": "D0046",
+    "type": "DLT",
+    "address": 47
+  },
+  {
+    "source": "D0056",
+    "target": "D0059",
+    "type": "DLT",
+    "address": 60
+  },
+  {
+    "source": "D0057",
+    "target": "D0060",
+    "type": "DLT",
+    "address": 61
+  },
+  {
+    "source": "D0058",
+    "target": "D0061",
+    "type": "DLT",
+    "address": 62
+  },
+  {
+    "source": "D0052",
+    "target": "D0062",
+    "type": "DLT",
+    "address": 63
+  },
+  {
+    "source": "D0053",
+    "target": "D0063",
+    "type": "DLT",
+    "address": 64
+  },
+  {
+    "source": "D0054",
+    "target": "D0064",
+    "type": "DLT",
+    "address": 65
+  },
+  {
+    "source": "D0055",
+    "target": "D0065",
+    "type": "DLT",
+    "address": 66
+  },
+  {
+    "source": "D0056",
+    "target": "D0066",
+    "type": "DLT",
+    "address": 67
+  },
+  {
+    "source": "D0057",
+    "target": "D0067",
+    "type": "DLT",
+    "address": 68
+  },
+  {
+    "source": "D0058",
+    "target": "D0068",
+    "type": "DLT",
+    "address": 69
+  },
+  {
+    "source": "D0052",
+    "target": "D0069",
+    "type": "DLT",
+    "address": 70
+  },
+  {
+    "source": "D0053",
+    "target": "D0070",
+    "type": "DLT",
+    "address": 71
+  },
+  {
+    "source": "D0054",
+    "target": "D0071",
+    "type": "DLT",
+    "address": 72
+  },
+  {
+    "source": "D0055",
+    "target": "D0072",
+    "type": "DLT",
+    "address": 73
+  },
+  {
+    "source": "D0056",
+    "target": "D0073",
+    "type": "DLT",
+    "address": 74
+  },
+  {
+    "source": "D0057",
+    "target": "D0074",
+    "type": "DLT",
+    "address": 75
+  },
+  {
+    "source": "D0058",
+    "target": "D0075",
+    "type": "DLT",
+    "address": 76
+  },
+  {
+    "source": "D0052",
+    "target": "D0076",
+    "type": "DLT",
+    "address": 77
+  },
+  {
+    "source": "D0053",
+    "target": "D0077",
+    "type": "DLT",
+    "address": 78
+  },
+  {
+    "source": "D0054",
+    "target": "D0078",
+    "type": "DLT",
+    "address": 79
+  },
+  {
+    "source": "D0055",
+    "target": "D0079",
+    "type": "DLT",
+    "address": 80
+  },
+  {
+    "source": "D0056",
+    "target": "D0080",
+    "type": "DLT",
+    "address": 81
+  },
+  {
+    "source": "D0057",
+    "target": "D0081",
+    "type": "DLT",
+    "address": 82
+  },
+  {
+    "source": "D0058",
+    "target": "D0082",
+    "type": "DLT",
+    "address": 83
+  },
+  {
+    "source": "D0052",
+    "target": "D0083",
+    "type": "DLT",
+    "address": 84
+  },
+  {
+    "source": "D0053",
+    "target": "D0084",
+    "type": "DLT",
+    "address": 85
+  },
+  {
+    "source": "D0054",
+    "target": "D0085",
+    "type": "DLT",
+    "address": 86
+  },
+  {
+    "source": "D0055",
+    "target": "D0086",
+    "type": "DLT",
+    "address": 87
+  },
+  {
+    "source": "D0056",
+    "target": "D0087",
+    "type": "DLT",
+    "address": 88
+  },
+  {
+    "source": "D0057",
+    "target": "D0088",
+    "type": "DLT",
+    "address": 89
+  },
+  {
+    "source": "D0058",
+    "target": "D0089",
+    "type": "DLT",
+    "address": 90
+  },
+  {
+    "source": "D0052",
+    "target": "D0090",
+    "type": "DLT",
+    "address": 91
+  },
+  {
+    "source": "D0053",
+    "target": "D0091",
+    "type": "DLT",
+    "address": 92
+  },
+  {
+    "source": "D0054",
+    "target": "D0092",
+    "type": "DLT",
+    "address": 93
+  },
+  {
+    "source": "D0055",
+    "target": "D0093",
+    "type": "DLT",
+    "address": 94
+  },
+  {
+    "source": "D0056",
+    "target": "D0094",
+    "type": "DLT",
+    "address": 95
+  },
+  {
+    "source": "D0057",
+    "target": "D0095",
+    "type": "DLT",
+    "address": 96
+  },
+  {
+    "source": "D0058",
+    "target": "D0096",
+    "type": "DLT",
+    "address": 97
+  },
+  {
+    "source": "D0052",
+    "target": "D0097",
+    "type": "DLT",
+    "address": 98
+  },
+  {
+    "source": "D0053",
+    "target": "D0098",
+    "type": "DLT",
+    "address": 99
+  },
+  {
+    "source": "D0001",
+    "target": "D0067",
+    "type": "LOGIC",
+    "action": "ALARM_TRIGGER"
+  },
+  {
+    "source": "D0006",
+    "target": "D0068",
+    "type": "LOGIC",
+    "action": "ALARM_TRIGGER"
+  },
+  {
+    "source": "D0011",
+    "target": "D0069",
+    "type": "LOGIC",
+    "action": "ALARM_TRIGGER"
+  },
+  {
+    "source": "D0016",
+    "target": "D0070",
+    "type": "LOGIC",
+    "action": "ALARM_TRIGGER"
+  }
+]
